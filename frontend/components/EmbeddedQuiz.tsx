@@ -6,16 +6,21 @@ import { CheckCircle2, XCircle, ArrowRight, Trophy, RefreshCcw } from 'lucide-re
 import { useEmbeddedTriviaGame } from '@/hooks/useEmbeddedTriviaGame';
 import { Question } from '@/data/learningContent';
 
+// Quiz component with progressive learning support
 export default function EmbeddedQuiz({
     questions,
     onRewardClaimed,
     getConnectedWallet,
-    onRetry
+    onRetry,
+    onNextModule,
+    isLastModule
 }: {
     questions: Question[];
     onRewardClaimed?: () => void;
     getConnectedWallet: () => any;
     onRetry: () => void;
+    onNextModule: () => void;
+    isLastModule: boolean;
 }) {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -123,10 +128,14 @@ export default function EmbeddedQuiz({
                 <div className="flex flex-col gap-3">
                     {isPassed && isConfirmed && (
                         <button
-                            onClick={() => window.location.reload()}
-                            className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-3 px-8 rounded-full transition-all"
+                            onClick={isLastModule ? () => window.location.reload() : onNextModule}
+                            className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-3 px-8 rounded-full transition-all flex items-center justify-center gap-2"
                         >
-                            Play Again
+                            {isLastModule ? (
+                                <>Play Again <RefreshCcw className="w-4 h-4" /></>
+                            ) : (
+                                <>Next Lesson <ArrowRight className="w-4 h-4" /></>
+                            )}
                         </button>
                     )}
 

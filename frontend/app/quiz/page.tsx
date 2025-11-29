@@ -13,17 +13,27 @@ export default function QuizPage() {
     const { address, getConnectedWallet, isLoading } = useEmbeddedWallet();
     const { balance, refetch } = useEmbeddedTokenBalance(address);
     const [view, setView] = useState<'learning' | 'quiz'>('learning');
-    const [currentModule, setCurrentModule] = useState<LearningModule | null>(null);
+    const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
 
+    const currentModule = learningModules[currentModuleIndex];
 
-    useEffect(() => {
-        if (address) {
-
-            const lastChar = address.slice(-1);
-            const index = parseInt(lastChar, 16) % learningModules.length;
-            setCurrentModule(learningModules[index]);
+    const handleQuizComplete = (passed: boolean) => {
+        if (passed) {
+            // If passed, allow moving to next module
+            // We'll wait for the user to click "Next Lesson" in the quiz component
         }
-    }, [address]);
+    };
+
+    const handleNextModule = () => {
+        if (currentModuleIndex < learningModules.length - 1) {
+            setCurrentModuleIndex(prev => prev + 1);
+            setView('learning');
+        } else {
+            // Completed all modules!
+            alert("Congratulations! You've completed all learning modules!");
+            // Optionally redirect to home or show a grand completion screen
+        }
+    };
 
     if (isLoading || !currentModule) {
         return (
@@ -96,6 +106,8 @@ export default function QuizPage() {
                         onRewardClaimed={refetch}
                         getConnectedWallet={getConnectedWallet}
                         onRetry={() => setView('learning')}
+                        onNextModule={handleNextModule}
+                        isLastModule={currentModuleIndex === learningModules.length - 1}
                     />
                 )}
             </div>
